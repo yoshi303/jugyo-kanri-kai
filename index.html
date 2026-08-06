@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="授業管理">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="updates.css">
+  <link rel="stylesheet" href="range.css">
+  <link rel="stylesheet" href="categories.css">
+  <link rel="stylesheet" href="calendar-labels.css">
+  <link rel="stylesheet" href="donut-fix.css">
+  <link rel="stylesheet" href="templates.css">
+  <link rel="stylesheet" href="print.css">
+  <link rel="stylesheet" href="final-ui.css">
+  <title>授業管理</title>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow" id="school-year">令和8年度</p>
+        <h1 id="page-title">今週の授業</h1>
+      </div>
+      <button class="round-button" id="settings-button" aria-label="設定を開く">⚙</button>
+    </header>
+
+    <section class="screen active" id="week-screen" aria-label="週次授業計画">
+      <section class="welcome-card" id="welcome-card"><div><strong>はじめに科目・学級を登録しましょう</strong><span>「年間時数」画面から追加すると、週次計画で授業を入力できます。</span></div><button type="button" id="dismiss-welcome" aria-label="案内を閉じる">×</button></section>
+      <div class="week-toolbar">
+        <button class="icon-button" id="previous-week" aria-label="前の週">‹</button>
+        <button class="date-chip" id="week-label">4月6日（月）〜4月10日（金）</button>
+        <button class="icon-button" id="next-week" aria-label="次の週">›</button>
+        <button class="template-button" id="open-templates">テンプレート</button>
+      </div>
+      <p class="helper">授業をタップすると、内容・教室・実施状況を編集できます。</p>
+      <button class="print-button" data-print-view="week">印刷・PDF</button>
+      <div class="week-grid" id="week-grid"></div>
+      <button class="floating-add" id="add-lesson">＋ 授業を追加</button>
+    </section>
+
+    <section class="screen" id="dashboard-screen" aria-label="年間時数">
+      <section class="range-card">
+        <div><h2>集計する期間</h2><button class="reset-range" id="reset-range">年度全体に戻す</button></div>
+        <div class="range-inputs"><label>開始日<input id="range-start" type="date"></label><span>〜</span><label>終了日<input id="range-end" type="date"></label></div>
+      </section>
+      <section class="hero-card">
+        <div>
+          <p>今年度の実施時数</p>
+          <strong id="year-progress">0時間</strong>
+          <span id="year-summary">2026年4月1日〜2027年3月31日</span>
+        </div>
+        <div class="donut" id="progress-donut"><span>実施</span></div>
+      </section>
+      <div class="section-heading"><h2>科目・学級別の実施時数</h2><span id="attention-count"></span></div>
+      <div class="progress-list" id="progress-list"></div>
+      <button class="print-button" data-print-view="dashboard">印刷・PDF</button>
+      <div class="section-heading subject-heading"><h2>科目・学級の設定</h2><button class="add-subject" id="add-subject">＋ 追加</button></div>
+      <div class="subject-settings" id="subject-settings"></div>
+    </section>
+
+    <section class="screen" id="calendar-screen" aria-label="月間カレンダー">
+      <div class="month-toolbar">
+        <button class="icon-button" id="previous-month" aria-label="前の月">‹</button>
+        <h2 id="month-label">2026年4月</h2>
+        <button class="icon-button" id="next-month" aria-label="次の月">›</button>
+      </div>
+      <button class="print-button" data-print-view="calendar">印刷・PDF</button>
+      <div class="calendar-weekdays"><span>月</span><span>火</span><span>水</span><span>木</span><span>金</span><span>土</span><span>日</span></div>
+      <div class="calendar-grid" id="calendar-grid"></div>
+      <section class="event-card">
+        <div class="event-card-heading"><h2 id="event-date">4月6日（月）</h2><button id="add-event">＋ 行事</button></div>
+        <div id="event-list"></div>
+      </section>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="メインメニュー">
+    <button class="nav-item active" data-screen="week-screen"><span>▦</span><small>週次計画</small></button>
+    <button class="nav-item" data-screen="dashboard-screen"><span>◔</span><small>年間時数</small></button>
+    <button class="nav-item" data-screen="calendar-screen"><span>□</span><small>カレンダー</small></button>
+  </nav>
+
+  <dialog id="lesson-dialog">
+    <form method="dialog" id="lesson-form">
+      <div class="dialog-head"><h2 id="dialog-title">授業を編集</h2><button class="close-button" value="cancel" formnovalidate aria-label="閉じる">×</button></div>
+      <label>日付<input id="lesson-date" type="date" required></label>
+      <div class="form-row"><label>時限<select id="lesson-period"><option value="1">1時間目</option><option value="2">2時間目</option><option value="3">3時間目</option><option value="4">4時間目</option><option value="5">5時間目</option><option value="6">6時間目</option></select></label><label>科目・学級<select id="lesson-subject"></select></label></div>
+      <label>授業内容<textarea id="lesson-content" rows="3" placeholder="例：授業テーマ"></textarea></label>
+      <label>使用教室<input id="lesson-room" type="text" placeholder="例：第一理科室"></label>
+      <label>実施状況<select id="lesson-status"><option value="planned">予定</option><option value="done">実施済み</option><option value="cancelled">休講</option><option value="rescheduled">振替予定</option></select></label>
+      <div class="dialog-actions"><div><button type="button" class="text-button" id="duplicate-lesson">複製</button><button type="button" class="text-button danger" id="delete-lesson">削除</button></div><button type="submit" class="primary-button" value="save">保存</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="settings-dialog">
+    <form method="dialog" id="settings-form">
+      <div class="dialog-head"><h2>設定・バックアップ</h2><button class="close-button" value="cancel" formnovalidate aria-label="閉じる">×</button></div>
+      <label>年度<input id="setting-year" type="number" min="2020" max="2100"></label>
+      <button type="button" class="settings-link" id="open-category-settings">行事カテゴリーを設定</button>
+      <p class="form-note">データはこの端末に保存されています。端末変更前にはバックアップを書き出してください。</p>
+      <div class="backup-buttons"><button type="button" id="export-data">バックアップファイルを書き出す</button><label class="file-button">バックアップを復元<input id="import-data" type="file" accept="application/json,.json"></label></div>
+      <div class="dialog-actions"><button type="submit" class="primary-button" value="save">設定を保存</button></div>
+    </form>
+  </dialog>
+  <dialog id="event-dialog"><form method="dialog" id="event-form"><div class="dialog-head"><h2>行事を追加</h2><button class="close-button" value="cancel" formnovalidate aria-label="閉じる">×</button></div><label>日付<input id="event-input-date" type="date" required></label><label>行事名<input id="event-title" required placeholder="例：校内行事"></label><label>カテゴリー<select id="event-category"></select></label><div class="dialog-actions"><button type="submit" class="primary-button" value="save">保存</button></div></form></dialog>
+  <dialog id="category-dialog"><form method="dialog" id="category-form"><div class="dialog-head"><h2>行事カテゴリーの設定</h2><button class="close-button" value="cancel" formnovalidate aria-label="閉じる">×</button></div><div class="category-list" id="category-list"></div><div class="new-category"><label>カテゴリー名<input id="category-name" maxlength="16" placeholder="例：校外行事"></label><label>色<input id="category-color" type="color" value="#0f766e"></label></div><button type="button" class="add-category" id="add-category">＋ カテゴリーを追加</button><div class="dialog-actions"><span></span><button type="submit" class="primary-button" value="save">完了</button></div></form></dialog>
+  <dialog id="subject-dialog"><form method="dialog" id="subject-form"><div class="dialog-head"><h2>科目・学級を追加</h2><button class="close-button" value="cancel" formnovalidate aria-label="閉じる">×</button></div><label>表示名<input id="subject-name" required maxlength="20" placeholder="例：1-2理"></label><div class="dialog-actions"><button type="submit" class="primary-button" value="save">登録</button></div></form></dialog>
+  <dialog id="template-dialog"><form method="dialog" id="template-form"><div class="dialog-head"><h2>週時間割テンプレート</h2><button class="close-button" value="cancel" formnovalidate aria-label="閉じる">×</button></div><p class="form-note">現在表示中の週から、科目・学級と教室をテンプレートとして保存します。授業内容・実施状況は引き継ぎません。</p><label>新しいテンプレート名<input id="template-name" maxlength="24" placeholder="例：通常週"></label><button type="button" class="add-template" id="save-template">現在の週を保存</button><div class="template-list" id="template-list"></div></form></dialog>
+  <script src="app.js"></script>
+</body>
+</html>
